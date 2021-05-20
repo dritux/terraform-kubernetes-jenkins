@@ -37,3 +37,8 @@ variable "replicas" {
   description = "no. of replicas you want"
   default     = "1"
 }
+variable "service_type" {
+  description = "type of kubernetes service for jenkins"
+  type        = string
+  default     = "NodePort"
+}
