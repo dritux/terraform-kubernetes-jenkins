@@ -109,15 +109,40 @@ resource "kubernetes_service" "jenkins-service" {
       app = var.name
     }
     port {
-      port = 8080
+      port        = 8080
+      target_port = 80
       name = "http"
     }
+
     port {
       port = 50000
       name = "tunnel"
     }
 
-    type = "ClusterIP"
+    type = var.service_type
+  }
+}
+
+resource "kubernetes_ingress" "jenkins-ingress" {
+  metadata {
+    name = "${var.name}-ingress"
+    namespace = var.namespace
+    annotations = {
+      "kubernetes.io/ingress.class" = "nginx"
+    }
+  }
+  spec {
+    rule {
+      http {
+        path {
+          path = "/*"
+          backend {
+            service_name = kubernetes_service.jenkins-service.metadata.0.name
+            service_port = 80
+          }
+        }
+      }
+    }
   }
 }
 
